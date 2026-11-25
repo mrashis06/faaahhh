@@ -34,7 +34,6 @@ async function init(){try{db=await openDB();notebooks=await readAll()}catch(e){c
 document.title='faaahhh';
 const pageTitle=document.querySelector('#page-title'); if(pageTitle&&pageTitle.firstChild) pageTitle.firstChild.textContent='Your files';
 const sectionTitle=document.querySelector('#section-title'); if(sectionTitle&&sectionTitle.firstChild) sectionTitle.firstChild.textContent='All files ';
-const namingObserver=new MutationObserver(()=>{document.querySelectorAll('#section-title,#crumb-view,.nav-item[data-view="all"]').forEach(e=>{if(e.textContent.toLowerCase().includes('notebook')||e.textContent.toLowerCase().includes('library')){const count=e.querySelector('span')?.textContent||'';if(e.id==='section-title')e.innerHTML=`All files <span>${count}</span>`;else if(e.id==='crumb-view')e.textContent='All files';else{const t=[...e.childNodes].find(n=>n.nodeType===3&&n.textContent.trim());if(t)t.textContent='All files'}})});}); namingObserver.observe(document.body,{subtree:true,childList:true,characterData:true});
 document.querySelectorAll('.sidebar-section-label').forEach(e=>e.textContent='YOUR SPACE');
 document.querySelectorAll('.nav-item[data-view="all"]').forEach(e=>{const t=[...e.childNodes].find(n=>n.nodeType===3&&n.textContent.trim());if(t)t.textContent='All files'});
 document.querySelectorAll('.eyebrow').forEach(e=>e.textContent='FAAAHHH / YOUR SPACE');
