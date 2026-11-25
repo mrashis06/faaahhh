@@ -50,4 +50,6 @@ const normalizeSearch=s=>String(s||'').toLocaleLowerCase().replace(/\.ipynb\b/g,
 $('#search-input')?.addEventListener('input',()=>{const query=normalizeSearch($('#search-input').value);const cards=[...document.querySelectorAll('#notebook-grid .notebook-card')];cards.forEach(card=>{const book=notebooks.find(n=>n.id===card.dataset.id);const hay=normalizeSearch(`${book?.filename||''} ${book?.title||''}`);card.hidden=!!query&&!hay.includes(query)});const shown=cards.filter(c=>!c.hidden).length;const count=$('#section-count');if(count)count.textContent=shown;const title=$('#section-title');if(title&&query)title.innerHTML=`Search results <span>${shown}</span>`;$('#notebook-grid').hidden=shown===0;$('#empty-state').hidden=shown!==0});
 $$('.view-btn').forEach(btn=>btn.classList.toggle('selected',btn.dataset.layout===currentLayout));
 $$('.view-btn').forEach(btn=>btn.addEventListener('click',()=>localStorage.setItem('faaahhh-layout',btn.dataset.layout)));
+// Reliable card opening: render the viewer first, then persist the opened timestamp.
+$('#notebook-grid')?.addEventListener('click',e=>{if(e.target.closest('button,[data-download]'))return;const card=e.target.closest('.notebook-card[data-id]');if(!card)return;e.stopImmediatePropagation();openNotebook(card.dataset.id)},{capture:true});
 
