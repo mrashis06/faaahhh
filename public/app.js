@@ -51,7 +51,8 @@ $('#search-input')?.addEventListener('input',()=>{const query=normalizeSearch($(
 $$('.view-btn').forEach(btn=>btn.classList.toggle('selected',btn.dataset.layout===currentLayout));
 $$('.view-btn').forEach(btn=>btn.addEventListener('click',()=>localStorage.setItem('faaahhh-layout',btn.dataset.layout)));
 // Reliable card opening: render the viewer first, then persist the opened timestamp.
-$('#notebook-grid')?.addEventListener('click',e=>{if(e.target.closest('button,[data-download]'))return;const card=e.target.closest('.notebook-card[data-id]');if(!card)return;e.stopImmediatePropagation();openNotebook(card.dataset.id)},{capture:true});
+$('#notebook-grid')?.addEventListener('click',e=>{if(e.target.closest('button,[data-download]'))return;const card=e.target.closest('.notebook-card[data-id]');if(!card)return;e.stopImmediatePropagation();history.pushState({notebook:true},'',`#file-${card.dataset.id}`);openNotebook(card.dataset.id)},{capture:true});
+window.addEventListener('popstate',()=>{const root=$('#modal-root');if(root)root.innerHTML='';if(location.hash.startsWith('#file-'))history.replaceState(null,'',location.pathname+location.search)});
 // Upload handler kept independent from search/card interactions.
 $('#file-input')?.addEventListener('change',async e=>{e.stopImmediatePropagation();const files=[...e.target.files];e.target.value='';const results=await Promise.all(files.map(addFile));const ok=results.filter(r=>r.ok).length;try{notebooks=await readAll()}catch{localStorage.setItem('faaahhh-cache',JSON.stringify(notebooks))}render();if(ok)showToast(`${ok} file${ok===1?'':'s'} added`);const failed=results.filter(r=>!r.ok);if(failed.length)showToast(failed[0].error)},{capture:true});
 $('#upload-trigger')?.addEventListener('click',e=>{e.stopImmediatePropagation();$('#file-input')?.click()},{capture:true});
