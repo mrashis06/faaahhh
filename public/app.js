@@ -3,7 +3,7 @@ let db; let notebooks=[]; let currentView='all'; let currentCollection=null; let
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 async function openDB(){return true}
-async function readAll(){const response=await fetch('/api/notebooks',{cache:'no-store'});if(!response.ok)throw new Error('Could not load notebooks');return response.json()}
+async function readAll(){const cached=localStorage.getItem('faaahhh-cache');if(cached&&!notebooks.length){try{notebooks=JSON.parse(cached);render()}catch{}}const response=await fetch('/api/notebooks',{cache:'no-store'});if(!response.ok)throw new Error('Could not load files');const fresh=await response.json();localStorage.setItem('faaahhh-cache',JSON.stringify(fresh));return fresh}
 async function putBook(book){const response=await fetch('/api/notebooks',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(book)});if(!response.ok){const detail=await response.json().catch(()=>({}));throw new Error(detail.error||'Could not save notebook')}return response.json()}
 async function deleteBook(){throw new Error('Cloud notebooks cannot be removed from this public interface')}
 function showToast(message){const el=$('#toast');el.textContent=message;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),2400)}
@@ -42,6 +42,10 @@ const themeButton=document.querySelector('#theme-toggle');
 function applyTheme(mode){document.documentElement.dataset.theme=mode;document.querySelector('meta[name="theme-color"]').content=mode==='dark'?'#0f1420':'#f5f7fb';themeButton.querySelector('.theme-icon').textContent=mode==='dark'?'☀':'☾';themeButton.querySelector('.theme-label').textContent=mode==='dark'?'Light mode':'Dark mode';themeButton.setAttribute('aria-label',`Switch to ${mode==='dark'?'light':'dark'} mode`);localStorage.setItem('faaahhh-theme',mode)}
 applyTheme(localStorage.getItem('faaahhh-theme')||'light');
 themeButton.addEventListener('click',()=>applyTheme(document.documentElement.dataset.theme==='dark'?'light':'dark'));
+// Keep the sidebar focused on files; settings remain out of the primary navigation.
+document.querySelector('#settings-open')?.closest('.sidebar-bottom')?.remove();
+const searchIndex=n=>n._search||(n._search=[n.title,n.filename,n.description,...(n.tags||[]),...(n.cells||[]).map(c=>c.source)].join(' ').toLocaleLowerCase());
+getVisible=function(){const q=$('#search-input').value.trim().toLocaleLowerCase();let list=[...notebooks];if(currentView==='starred')list=list.filter(n=>n.starred);if(currentView==='recent')list=list.filter(n=>n.lastOpened).sort((a,b)=>b.lastOpened-a.lastOpened).slice(0,20);if(currentCollection)list=list.filter(n=>n.collection===currentCollection);if(q)list=list.filter(n=>searchIndex(n).includes(q));const sort=$('#sort-select').value;if(sort==='name')list.sort((a,b)=>a.title.localeCompare(b.title));else if(sort==='created')list.sort((a,b)=>b.created-a.created);else list.sort((a,b)=>b.updated-a.updated);return list};
 $$('.view-btn').forEach(btn=>btn.classList.toggle('selected',btn.dataset.layout===currentLayout));
 $$('.view-btn').forEach(btn=>btn.addEventListener('click',()=>localStorage.setItem('faaahhh-layout',btn.dataset.layout)));
 
