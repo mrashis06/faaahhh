@@ -10,10 +10,11 @@ export async function GET() {
     let cursor;
     do {
       const page = await list({ prefix: 'notebooks/', limit: 1000, cursor });
-      for (const blob of page.blobs) {
-        const response = await fetch(blob.url);
-        if (response.ok) books.push(await response.json());
-      }
+      const pageBooks = await Promise.all(page.blobs.map(async blob => {
+        try { const response = await fetch(blob.url); return response.ok ? await response.json() : null; }
+        catch { return null; }
+      }));
+      books.push(...pageBooks.filter(Boolean));
       cursor = page.hasMore ? page.cursor : undefined;
     } while (cursor);
     return respond(books);
