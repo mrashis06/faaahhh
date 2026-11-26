@@ -37,6 +37,8 @@ const sectionTitle=document.querySelector('#section-title'); if(sectionTitle&&se
 document.querySelectorAll('.sidebar-section-label').forEach(e=>e.textContent='YOUR SPACE');
 document.querySelectorAll('.nav-item[data-view="all"]').forEach(e=>{const t=[...e.childNodes].find(n=>n.nodeType===3&&n.textContent.trim());if(t)t.textContent='All files'});
 document.querySelectorAll('.eyebrow').forEach(e=>e.textContent='FAAAHHH / YOUR SPACE');
+const downloadAllButton=document.createElement('button');downloadAllButton.id='download-all';downloadAllButton.className='secondary-btn';downloadAllButton.textContent='Download all';document.querySelector('#upload-trigger')?.parentElement?.append(downloadAllButton);
+downloadAllButton.addEventListener('click',()=>{if(!notebooks.length)return showToast('No files to download');notebooks.forEach((book,index)=>setTimeout(()=>downloadBook(book),index*180));showToast(`Downloading ${notebooks.length} files`)});
 init();
 const themeButton=document.querySelector('#theme-toggle');
 function applyTheme(mode){document.documentElement.dataset.theme=mode;document.querySelector('meta[name="theme-color"]').content=mode==='dark'?'#0f1420':'#f5f7fb';themeButton.querySelector('.theme-icon').textContent=mode==='dark'?'☀':'☾';themeButton.querySelector('.theme-label').textContent=mode==='dark'?'Light mode':'Dark mode';themeButton.setAttribute('aria-label',`Switch to ${mode==='dark'?'light':'dark'} mode`);localStorage.setItem('faaahhh-theme',mode)}
