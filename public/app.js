@@ -1,5 +1,5 @@
 const DB_NAME='cellar-notebook-library', DB_VERSION=1, STORE='notebooks';
-let db; let notebooks=[]; let currentView='all'; let currentCollection=null; let collectionList=[]; let currentLayout=localStorage.getItem('faaahhh-layout')||'grid'; let toastTimer;
+let db; let notebooks=[]; let currentView='all'; let currentCollection=null; let collectionList=[]; let currentLayout=localStorage.getItem('faaahhh-layout')||'list'; let toastTimer;
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 async function openDB(){return true}
