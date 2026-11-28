@@ -6,19 +6,46 @@ const respond = (body, status = 200) => Response.json(body, { status, headers: {
 
 export async function GET() {
   try {
-    const books = [];
+    const metadata = new Map();
     let cursor;
-    for (const prefix of ['notebooks/','c-files/','pkt-files/']) { cursor = undefined; do {
-      const page = await list({ prefix, limit: 1000, cursor });
-      const pageBooks = await Promise.all(page.blobs.map(async blob => {
-        try { const response = await fetch(blob.url); return response.ok ? await response.json() : null; }
+    do {
+      const page = await list({ prefix: 'metadata/', limit: 1000, cursor });
+      const summaries = await Promise.all(page.blobs.map(async blob => {
+        try { const response = await fetch(blob.url + '?v=' + encodeURIComponent(blob.uploadedAt || Date.now())); return response.ok ? await response.json() : null; }
         catch { return null; }
       }));
-      books.push(...pageBooks.filter(Boolean));
+      for (const summary of summaries) if (summary?.id) metadata.set(summary.id, summary);
       cursor = page.hasMore ? page.cursor : undefined;
-    } while (cursor); }
+    } while (cursor);
+
+    const books = [];
+    for (const prefix of ['notebooks/','c-files/','pkt-files/']) {
+      cursor = undefined;
+      do {
+        const page = await list({ prefix, limit: 1000, cursor });
+        const pageBooks = await Promise.all(page.blobs.map(async blob => {
+          const id = blob.pathname.split('/').pop()?.replace(/\.json$/, '');
+          if (metadata.has(id)) return { ...metadata.get(id), blobUrl: blob.url, remoteOnly: true, cells: [] };
+          try {
+            const response = await fetch(blob.url + '?v=' + encodeURIComponent(blob.uploadedAt || Date.now()));
+            if (!response.ok) return null;
+            const book = await response.json();
+            if (blob.size > 3 * 1024 * 1024) {
+              const { notebook, data, source, cells, ...summary } = book;
+              return { ...summary, blobUrl: blob.url, remoteOnly: true, cells: [] };
+            }
+            return book;
+          } catch { return null; }
+        }));
+        books.push(...pageBooks.filter(Boolean));
+        cursor = page.hasMore ? page.cursor : undefined;
+      } while (cursor);
+    }
     return respond(books);
-  } catch { return respond({ error: 'Could not load notebooks.' }, 500); }
+  } catch (error) {
+    console.error('Could not load files', error);
+    return respond({ error: 'Could not load files.' }, 500);
+  }
 }
 
 export async function POST(request) {
@@ -34,4 +61,4 @@ export async function POST(request) {
 }
 
 
-export async function DELETE(request){try{const u=new URL(request.url),id=u.searchParams.get('id'),type=u.searchParams.get('type')==='pkt'?'pkt-files':u.searchParams.get('type')==='c'?'c-files':'notebooks';if(!id)return respond({error:'Invalid id'},400);await del(type+'/'+id+'.json');return respond({ok:true})}catch{return respond({error:'Could not delete file'},500)}}
+export async function DELETE(request){try{const u=new URL(request.url),id=u.searchParams.get('id'),type=u.searchParams.get('type')==='pkt'?'pkt-files':u.searchParams.get('type')==='c'?'c-files':'notebooks';if(!id)return respond({error:'Invalid id'},400);await del(type+'/'+id+'.json');try{await del('metadata/'+id+'.json')}catch(error){console.error('Could not remove file metadata',error)}return respond({ok:true})}catch{return respond({error:'Could not delete file'},500)}}
