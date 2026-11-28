@@ -1,7 +1,7 @@
 import { list, put, del } from '@vercel/blob';
 
 const MAX_BYTES = 5 * 1024 * 1024;
-const valid = b => b && /^[a-f0-9-]{36}$/i.test(b.id) && typeof b.filename === 'string' && ((b.fileType==='pkt' && b.filename.toLowerCase().endsWith('.pkt') && typeof b.data==='string' && /^[A-Za-z0-9+/]*={0,2}$/.test(b.data)) || (b.fileType==='c' && b.filename.toLowerCase().endsWith('.c') && typeof b.source==='string') || (b.fileType!=='c' && b.filename.toLowerCase().endsWith('.ipynb') && Array.isArray(b.notebook?.cells) && Array.isArray(b.cells)));
+const valid = b => b && /^[a-f0-9-]{36}$/i.test(b.id) && typeof b.filename === 'string' && ((b.fileType==='pkt' && b.filename.toLowerCase().endsWith('.pkt') && typeof b.data==='string' && /^[A-Za-z0-9+/]*={0,2}$/.test(b.data)) || (b.fileType==='c' && b.filename.toLowerCase().endsWith('.c') && typeof b.source==='string') || (b.fileType!=='c' && b.filename.toLowerCase().endsWith('.ipynb') && Array.isArray(b.notebook?.cells) && (b.cells===undefined || Array.isArray(b.cells))));
 const respond = (body, status = 200) => Response.json(body, { status, headers: { 'cache-control': 'no-store' } });
 
 export async function GET() {
