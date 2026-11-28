@@ -10,3 +10,26 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 /* Keep selection separate from the file icon in grid and list views. */
 .file-card{padding-left:48px!important}.file-card-top{padding-left:0}.notebook-grid.list .file-card{grid-template-columns:48px minmax(0,1fr) auto}.select-file{left:16px;top:50%;transform:translateY(-50%);width:18px;height:18px;z-index:3;touch-action:manipulation}.file-card.is-selected{border-color:var(--accent)}@media(max-width:620px){.notebook-grid.list .file-card{grid-template-columns:38px minmax(0,1fr)}.select-file{left:15px}}
 .select-all-btn{border:1px solid var(--border);background:var(--surface);color:var(--text-soft);border-radius:7px;padding:8px 11px;font-size:11px;white-space:nowrap}.select-all-btn:hover,.select-all-btn[aria-pressed="true"]{color:var(--accent);border-color:var(--accent)}@media(max-width:620px){.toolbar-right{flex-wrap:wrap;justify-content:flex-end}.select-all-btn{min-height:36px}}
+@media(max-width:620px){
+  .content-wrap{padding:24px 16px 32px}
+  .welcome-row{align-items:center;gap:12px}
+  .welcome-row h1{font-size:27px}
+  .toolbar{display:grid;grid-template-columns:1fr;gap:12px;margin-top:28px}
+  .type-bar{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));width:100%;gap:6px;margin:0}
+  .type-bar button{min-width:0;padding:10px 5px;text-align:center}
+  .search-wrap{width:100%;max-width:none;min-width:0;height:44px}
+  .toolbar-right{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));width:100%;gap:8px;margin:0}
+  .toolbar-right>.select-all-btn,.toolbar-right>#download-all,.toolbar-right>.sort-wrap,.toolbar-right>.view-toggle{min-width:0}
+  .select-all-btn{min-height:40px}
+  .bulk-actions{grid-column:1/-1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .bulk-actions button{min-height:40px}
+  .sort-wrap{justify-content:center;min-height:40px;border:1px solid var(--border);border-radius:7px;background:var(--surface)}
+  .view-toggle{justify-self:stretch;justify-content:center;min-height:40px}
+  .section-heading{margin-top:24px}
+  .notebook-grid.list .file-card{grid-template-columns:38px minmax(0,1fr);gap:4px 12px;min-height:94px;padding:13px 12px 12px 46px!important}
+  .notebook-grid.list .file-card-main{grid-column:2;align-self:center;min-width:0}
+  .notebook-grid.list .file-card-footer{grid-column:2;margin:0;justify-content:flex-start}
+  .notebook-grid.list .file-actions{gap:12px}
+  .notebook-grid.list .file-actions .card-action{padding:5px 2px;font-size:11px}
+  .select-file{left:14px;width:20px;height:20px}
+}
